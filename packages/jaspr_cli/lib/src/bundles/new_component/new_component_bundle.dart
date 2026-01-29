@@ -1,0 +1,21 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, implicit_dynamic_list_literal, implicit_dynamic_map_literal, inference_failure_on_collection_literal
+
+import 'package:mason/mason.dart';
+
+final newComponentBundle = MasonBundle.fromJson(<String, dynamic>{
+  "files": [
+    {
+      "path": "{{name.snakeCase()}}.dart",
+      "data":
+          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2RvbS5kYXJ0JzsKe3teYXN5bmN9fWltcG9ydCAncGFja2FnZTpqYXNwci9qYXNwci5kYXJ0Jzt7ey9hc3luY319e3sjYXN5bmN9fWltcG9ydCAncGFja2FnZTpqYXNwci9zZXJ2ZXIuZGFydCc7e3svYXN5bmN9fQoKe3sjY2xpZW50fX1AY2xpZW50e3svY2xpZW50fX17eyNzdGF0ZWxlc3N9fQpjbGFzcyB7e25hbWUucGFzY2FsQ2FzZSgpfX0gZXh0ZW5kcyBTdGF0ZWxlc3NDb21wb25lbnQgewogIGNvbnN0IHt7bmFtZS5wYXNjYWxDYXNlKCl9fSh7c3VwZXIua2V5fSk7CgogIEBvdmVycmlkZQogIENvbXBvbmVudCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgewogICAgcmV0dXJuIGRpdihbXSk7CiAgfXt7L3N0YXRlbGVzc319e3sjc3RhdGVmdWx9fQpjbGFzcyB7e25hbWUucGFzY2FsQ2FzZSgpfX0gZXh0ZW5kcyBTdGF0ZWZ1bENvbXBvbmVudCB7CiAgY29uc3Qge3tuYW1lLnBhc2NhbENhc2UoKX19KHtzdXBlci5rZXl9KTsKCiAgQG92ZXJyaWRlCiAgU3RhdGU8e3tuYW1lLnBhc2NhbENhc2UoKX19PiBjcmVhdGVTdGF0ZSgpID0+IF97e25hbWUucGFzY2FsQ2FzZSgpfX1TdGF0ZSgpOwp9CgpjbGFzcyBfe3tuYW1lLnBhc2NhbENhc2UoKX19U3RhdGUgZXh0ZW5kcyBTdGF0ZTx7e25hbWUucGFzY2FsQ2FzZSgpfX0+IHsKICB7eyNjbGllbnR9fQogIEBvdmVycmlkZQogIHZvaWQgaW5pdFN0YXRlKCkgewogICAgc3VwZXIuaW5pdFN0YXRlKCk7CiAgICBpZiAoa0lzV2ViKSB7CiAgICAgIC8vIFJ1biBjbGllbnQtc2lkZSBpbml0aWFsaXphdGlvbiBsb2dpYyBoZXJlCiAgICB9IGVsc2UgewogICAgICAvLyBSdW4gc2VydmVyLXNpZGUgaW5pdGlhbGl6YXRpb24gbG9naWMgaGVyZQogICAgfQogIH0KICB7ey9jbGllbnR9fQogIEBvdmVycmlkZQogIENvbXBvbmVudCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgewogICAgcmV0dXJuIGRpdihbXSk7CiAgfXt7L3N0YXRlZnVsfX17eyNhc3luY319CgpjbGFzcyB7e25hbWUucGFzY2FsQ2FzZSgpfX0gZXh0ZW5kcyBBc3luY1N0YXRlbGVzc0NvbXBvbmVudCB7CiAgY29uc3Qge3tuYW1lLnBhc2NhbENhc2UoKX19KHtzdXBlci5rZXl9KTsKCiAgQG92ZXJyaWRlCiAgRnV0dXJlPENvbXBvbmVudD4gYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpIGFzeW5jIHsKICAgIHJldHVybiBkaXYoW10pOwogIH17ey9hc3luY319e3sjc3R5bGVzfX0KCiAgQGNzcwogIExpc3Q8U3R5bGVSdWxlPiBnZXQgc3R5bGVzID0+IFtdO3t7L3N0eWxlc319Cn0K",
+      "type": "text",
+    },
+  ],
+  "hooks": [],
+  "name": "new_component",
+  "description": "A jaspr_cli brick to create new components",
+  "version": "0.1.0",
+  "environment": {"mason": ">=0.1.0-dev.52 <0.1.0"},
+  "vars": {},
+});

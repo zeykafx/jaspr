@@ -3,6 +3,7 @@ import 'dart:io';
 void main() async {
   await generate('scaffold');
   await generate('templates/docs');
+  await generate('new_component');
 
   Process.runSync('dart', 'format lib/src/bundles/ --line-length=120'.split(' '));
 }
