@@ -2,9 +2,17 @@ import 'dart:io';
 
 import 'package:mason/mason.dart' hide Level;
 
-import '../bundles/new_component/new_component_bundle.dart';
+import '../bundles/new_component_bricks/new_async_component/new_async_component_bundle.dart';
+import '../bundles/new_component_bricks/new_stateful_component/new_stateful_component_bundle.dart';
+import '../bundles/new_component_bricks/new_stateless_component/new_stateless_component_bundle.dart';
 import '../logging.dart';
 import 'base_command.dart';
+
+Map<String, MasonBundle> compTypeToBundle = {
+  'stateless': newStatelessComponentBundle,
+  'stateful': newStatefulComponentBundle,
+  'async': newAsyncComponentBundle,
+};
 
 class NewCommand extends BaseCommand {
   NewCommand({super.logger}) {
@@ -68,6 +76,7 @@ class ComponentCommand extends BaseCommand {
     );
     argParser.addFlag(
       'with-styles',
+      aliases: ['styled', 'with-style'],
       help: 'Add a style rules getter in the component (Only supported in server and static modes).',
       negatable: false,
       defaultsTo: false,
@@ -112,10 +121,18 @@ class ComponentCommand extends BaseCommand {
     final isClient = argResults!.flag('client');
 
     // don't create a client component if the component is an AsyncStatelessComponent
-    final useClient = isAsync && isClient ? false : isClient;
+    // final useClient = isAsync && isClient ? false : isClient;
+    var useClient = isClient;
+    if (isAsync && isClient) {
+      logger.write(
+        'Cannot create a client AsyncStatelessComponent. Creating a server-side component instead.',
+        level: Level.warning,
+      );
+
+      useClient = false;
+    }
 
     return await createFromTemplate(
-      'new_component',
       dir,
       name,
       useStateless,
@@ -127,7 +144,6 @@ class ComponentCommand extends BaseCommand {
   }
 
   Future<int> createFromTemplate(
-    String template,
     Directory dir,
     String name,
     bool isStateless,
@@ -136,11 +152,11 @@ class ComponentCommand extends BaseCommand {
     bool withStyles,
     bool isClient,
   ) async {
-    final componentType = isAsync ? 'async stateless' : (isStateless ? 'stateless' : 'stateful');
+    final componentType = isAsync ? 'async' : (isStateless ? 'stateless' : 'stateful');
     final progress = logger.logger!.progress(
       'Generating $componentType component "$name"...',
     );
-    final generator = await MasonGenerator.fromBundle(newComponentBundle);
+    final generator = await MasonGenerator.fromBundle(compTypeToBundle[componentType]!);
     final files = await generator.generate(
       DirectoryGeneratorTarget(dir),
       vars: {
