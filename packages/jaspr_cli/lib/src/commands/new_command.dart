@@ -169,6 +169,10 @@ class ComponentCommand extends BaseCommand {
       },
       logger: logger.logger,
     );
+
+    // format the generated component
+    Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
+
     progress.complete('Generated $componentType component $name: ${files.first.path}');
 
     return 0;

@@ -7,8 +7,10 @@ class {{name.pascalCase()}} extends AsyncStatelessComponent {
   @override
   Future<Component> build(BuildContext context) async {
     return div([]);
-  }{{#styles}}
+  }
 
+  {{#styles}}
   @css
-  List<StyleRule> get styles => [];{{/styles}}
+  List<StyleRule> get styles => [];
+  {{/styles}}
 }

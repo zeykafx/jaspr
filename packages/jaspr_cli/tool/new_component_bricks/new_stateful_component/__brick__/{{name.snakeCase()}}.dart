@@ -1,7 +1,8 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 {{#client}}
-@client{{/client}}
+@client
+{{/client}}
 class {{name.pascalCase()}} extends StatefulComponent {
   const {{name.pascalCase()}}({super.key});
 
@@ -10,7 +11,9 @@ class {{name.pascalCase()}} extends StatefulComponent {
 }
 
 class _{{name.pascalCase()}}State extends State<{{name.pascalCase()}}> {
-  {{#client}}@override
+
+  {{#client}}
+  @override
   void initState() {
     super.initState();
     if (kIsWeb) {
@@ -18,12 +21,16 @@ class _{{name.pascalCase()}}State extends State<{{name.pascalCase()}}> {
     } else {
       // Run server-side initialization logic here
     }
-  }{{/client}}
+  }
+  {{/client}}
+
   @override
   Component build(BuildContext context) {
     return div([]);
-  }{{#styles}}
+  }
 
+  {{#styles}}
   @css
-  List<StyleRule> get styles => [];{{/styles}}
+  List<StyleRule> get styles => [];
+  {{/styles}}
 }
