@@ -1,4 +1,7 @@
-## Unreleased patch
+## 0.22.2
+
+- Added `--web-port` and `--proxy-port` options to `jaspr serve` for configuring webdev and proxy server ports.
+  - Allows running multiple Jaspr projects simultaneously with different ports.
 
 - Fixed `testComponents` failing with `RawText` components due to `MarkupRenderObject` cast error.
   - Added `RawableRenderObject` and `RawableRenderText` interfaces for raw HTML text rendering support.
@@ -6,6 +9,13 @@
   - `MarkupRenderText` and `TestRenderText` now implement `RawableRenderText`.
 
 - Fixed encoding of `lastmod` property in generated sitemap to be a valid W3C date string.
+- Fixed launching debug builds in Safari.
+
+- Added `--target-os` and `--target-arch` options to the build command to cross-compile server binaries.
+- Added `--dart-define-from-file` option to the serve and build commands.
+- Respect `PUB_HOSTED_URL` environment variable for custom pub mirrors.
+
+- Added an example to show on pub.dev.
 
 ## 0.22.1
 
@@ -207,7 +217,7 @@
 
   Exclude routes from the sitemap through the `--sitemap-exclude` option to `jaspr build`.
 
-  Read more about [Generating a Sitemap](https://docs.jaspr.site/concepts/static_sites#generating-a-sitemap).
+  Read more about [Generating a Sitemap](https://docs.jaspr.site/dev/static_sites#generating-a-sitemap).
 
 - Added support `@client` components from other packages.
 
