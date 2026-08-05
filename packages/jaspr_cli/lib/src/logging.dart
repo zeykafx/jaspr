@@ -77,7 +77,12 @@ class _Logger extends Logger {
       return;
     }
 
-    final showAsProgress = !verbose && progress != null && (progress == ProgressState.running || _progress != null);
+    // don't show warnings, errors, or anything higher as progress otherwise each log will erase the previous one
+    final showAsProgress =
+        !verbose &&
+        level.index < Level.warning.index &&
+        progress != null &&
+        (progress == ProgressState.running || _progress != null);
 
     final String log = '${tag?.format() ?? ''}${level.format(message.trim())}';
 
@@ -95,7 +100,8 @@ class _Logger extends Logger {
       }
     } else {
       if (_progress != null) {
-        _progress!.cancel();
+        // mason's Progress.cancel does not re-enable line wrapping, whereas Progress.fail and Progress.complete do
+        _progress!.fail();
         _progress = null;
       }
 
