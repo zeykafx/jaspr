@@ -4,3 +4,4 @@ analyzer:
   exclude:
     - tool/scaffold/**
     - tool/templates/**
+    - tool/new_component_bricks/**

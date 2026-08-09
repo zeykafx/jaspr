@@ -26,11 +26,8 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
     // NOTE: we re-read the pubspec file after the potential installation of packages
     final pubspecMap = readPubspec(projectRoot);
 
-    final configYaml = pubspecMap?['jaspr'];
-    if (configYaml is! YamlMap) {
-      currentFlutterMode = FlutterMode.none;
-    }
-    final modeYaml = configYaml['flutter'];
+    final Object? configYaml = pubspecMap?['jaspr'];
+    final modeYaml = configYaml is YamlMap ? configYaml['flutter'] : null;
     if (modeYaml is! String) {
       currentFlutterMode = FlutterMode.none;
     }
