@@ -81,6 +81,13 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
       negatable: false,
       defaultsTo: false,
     );
+    argParser.addFlag(
+      'install-deps',
+      aliases: ['install-dependencies'],
+      help: 'Always install dependencies if required.',
+      negatable: false,
+      defaultsTo: false,
+    );
     argParser.addSeparator('Component flags: choose which type of component to create (Only use one of these 5 flags)');
     argParser.addFlag(
       'stateless',
@@ -173,8 +180,10 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
   late bool withStyles = argResults!.flag('with-styles');
   late bool isClient = argResults!.flag('client');
   late bool withTest = argResults!.flag('with-test');
-  late final bool dryRun = argResults!.flag('dry-run');
   late String flutterAppName = argResults!.option('flutter-app-name') ?? '';
+
+  late final bool dryRun = argResults!.flag('dry-run');
+  late final bool alwaysInstallDeps = argResults!.flag('install-deps');
 
   late final ComponentType componentType;
 
@@ -414,7 +423,7 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     );
 
     // if jaspr_test is not in the dev dependencies, prompt the user to add it
-    conditionallyInstallDeps(projectRoot, ['jaspr_test'], isDevDependency: true);
+    conditionallyInstallDeps(projectRoot, ['jaspr_test'], isDevDependency: true, alwaysInstallDeps: alwaysInstallDeps);
 
     return 0;
   }
@@ -460,9 +469,9 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     }
 
     // add flutter and jaspr_flutter_embed in dependencies if they aren't present (prompts to add them)
-    conditionallyInstallDeps(projectRoot, ['flutter', 'jaspr_flutter_embed'], isDevDependency: false);
+    conditionallyInstallDeps(projectRoot, ['flutter', 'jaspr_flutter_embed'], isDevDependency: false, alwaysInstallDeps: alwaysInstallDeps);
     // also install other useful deps
-    conditionallyInstallDeps(projectRoot, ['flutter_lints', 'flutter_test'], isDevDependency: true);
+    conditionallyInstallDeps(projectRoot, ['flutter_lints', 'flutter_test'], isDevDependency: true, alwaysInstallDeps: alwaysInstallDeps);
 
     // set jaspr.flutter mode to embedded if it isn't the case
     // If the flutter mode is set to plugins, then we ask the user if they

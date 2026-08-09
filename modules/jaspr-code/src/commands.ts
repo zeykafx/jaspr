@@ -3,7 +3,7 @@ import { checkJasprInstalled } from "./helpers/install_helper";
 import { runJasprCommand, runJasprCommandInFolder } from "./helpers/process_helper";
 import { getFolderToRunCommandIn } from "./helpers/project_helper";
 import { JasprServeDaemon } from "./jaspr/serve_daemon";
-import { JasprNewComponentOptions } from "./new_components";
+import { JasprNewComponentOptions, JasprNewPageOption } from "./new_item";
 
 export type JasprMode = "static" | "server" | "client";
 export type JasprModeOption = JasprMode | "static:auto" | "server:auto";
@@ -89,7 +89,7 @@ export function jasprServe(context: ExtensionContext) {
   }
 }
 
-export async function jasprNew(
+export async function jasprNewComponent(
   projectDir: string,
   completePath: string,
   options: JasprNewComponentOptions,
@@ -156,9 +156,54 @@ export async function jasprNew(
 
   args.push("--path", completePath);
 
+  // always install dependencies
+  args.push("--install-deps");
+
   args.push(name);
 
   const exitCode = await runJasprCommandInFolder(projectDir, args, undefined);
 
   return exitCode === 0;
 }
+
+export async function jasprNewPage(
+  projectDir: string,
+  completePath: string,
+  options: JasprNewPageOption,
+  name: string,
+): Promise<boolean> {
+  const isInstalled = await checkJasprInstalled();
+  if (!isInstalled) {
+    return false;
+  }
+
+  const args = ["new", "page"];
+
+  args.push("--format", options.format);
+
+  if (options.layout) {
+    args.push("--layout", options.layout);
+  }
+
+  if (options.title) {
+    args.push("--title", options.title);
+  }
+  if (options.description) {
+    args.push("--description", options.description);
+  }
+  for (const option of options.options) {
+    args.push(`--${option}`)
+  }
+
+  args.push("--path", completePath);
+
+  args.push("--install-deps");
+  args.push("--ignore-prompts");
+
+  args.push(name);
+
+  const exitCode = await runJasprCommandInFolder(projectDir, args, undefined);
+
+  return exitCode === 0;
+}
+

@@ -38,6 +38,13 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       defaultsTo: false,
     );
     argParser.addFlag(
+      'install-deps',
+      aliases: ['install-dependencies'],
+      help: 'Always install dependencies if required.',
+      negatable: false,
+      defaultsTo: false,
+    );
+    argParser.addFlag(
       'index',
       help: 'Create an index page instead of a normal page',
       negatable: false,
@@ -68,6 +75,14 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       negatable: true,
       defaultsTo: true,
     );
+
+    argParser.addFlag(
+      'ignore-prompts',
+      help: 'Ignore all prompts/warnings during page generation',
+      negatable: false,
+      defaultsTo: false,
+      hide: true,
+    );
   }
 
   @override
@@ -89,6 +104,9 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
 
   // flags
   late final bool dryRun = argResults!.flag('dry-run');
+  late final bool alwaysInstallDeps = argResults!.flag('install-deps');
+  late final bool ignorePrompts = argResults!.flag('ignore-prompts');
+
   late final bool isIndexPage = argResults!.flag('index');
   late bool withSitemap = argResults!.flag('sitemap');
   late bool excludeFromSitemap = argResults!.flag('sitemap-exclude');
@@ -153,7 +171,12 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       return 1;
     }
 
-    conditionallyInstallDeps(projectRoot, ['jaspr_content'], isDevDependency: false);
+    conditionallyInstallDeps(
+      projectRoot,
+      ['jaspr_content'],
+      isDevDependency: false,
+      alwaysInstallDeps: alwaysInstallDeps,
+    );
 
     return await createFromTemplate(
       dir,
@@ -254,21 +277,23 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     // if no custom parsers are used and the format provided is not parsable, then warn the user
     // e.g., if the user want's a markdown page but only the HtmlParser is used
     if (parsers.isNotEmpty && !parsers.contains(pageFormat) && !parsers.contains('custom')) {
-      bool confirmRes = false;
+      // ignorePrompts is false by default, but when used by the vscode extension it is set to true
+      // in order to bypass all confirm prompts and carry on anyways
+      bool confirmRes = ignorePrompts;
 
       // only prompt if there is a terminal attached
       if (stdout.hasTerminal) {
         confirmRes =
             logger.logger?.confirm(
               '\n[WARNING] Could not find the parser required to parse the provided format "$pageFormat". Do you want to continue anyway?',
-              defaultValue: false,
+              defaultValue: true,
             ) ??
-            false;
+            true;
       }
 
       if (!confirmRes) {
         logger.write(
-          'Cancelling... Please add the required parser to parse $pageFormat',
+          'Cancelling... Please add the parser required to parse $pageFormat',
           tag: Tag.cli,
           level: Level.error,
         );
@@ -279,7 +304,8 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     // if the layouts section isnt empty and the user has passed in a specific layout, but that layout isn't a predefined layout and the layouts section does not contain a custom layout
     // then warn the user that this layout may or may not work as they expect
     if (layouts.isNotEmpty && pageLayout.isNotEmpty && !layouts.contains(pageLayout) && !layouts.contains('custom')) {
-      bool confirmRes = false;
+      bool confirmRes = ignorePrompts;
+
       if (stdout.hasTerminal) {
         confirmRes =
             logger.logger?.confirm(
@@ -291,7 +317,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
 
       if (!confirmRes) {
         logger.write(
-          'Cancelling... Please add the required prebuilt layout to correctly display $pageLayout',
+          'Cancelling... Please add the prebuilt layout required to correctly display $pageLayout',
           tag: Tag.cli,
           level: Level.error,
         );

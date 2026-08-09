@@ -63,7 +63,7 @@
       },
       {
         "command": "jaspr.new",
-        "title": "New Component",
+        "title": "New Component or Page",
         "category": "Jaspr"
       }
     ],

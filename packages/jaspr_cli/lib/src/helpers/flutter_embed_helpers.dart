@@ -53,12 +53,20 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
           if (pubspecMap.nodes['jaspr'] case final YamlMap jasprMap) {
             // if there is already a flutter mode, then it presumably is set to "plugins", so we ask the user to confirm that they want to change it
             if (jasprMap.nodes['flutter'] case final YamlScalar flutterNode when flutterNode.value != null) {
-              final bool overwritePlugins = logger.logger!.confirm(
-                'This project is set with jaspr.flutter mode set to plugins. Do you want to overwrite it to "embedded" to allow Flutter embedding?',
-                defaultValue: false,
-              );
-              if (overwritePlugins) {
-                builder.replace(flutterNode.span.start.offset, flutterNode.span.length, 'embedded');
+              if (!stdout.hasTerminal) {
+                logger.write(
+                  'Cannot automatically set jaspr.flutter mode to embedded, set the jaspr.flutter mode to embedded manually in pubspec.yaml',
+                  tag: Tag.cli,
+                  level: Level.warning,
+                );
+              } else {
+                final bool overwritePlugins = logger.logger!.confirm(
+                  'This project is set with jaspr.flutter mode set to plugins. Do you want to overwrite it to "embedded" to allow Flutter embedding?',
+                  defaultValue: false,
+                );
+                if (overwritePlugins) {
+                  builder.replace(flutterNode.span.start.offset, flutterNode.span.length, 'embedded');
+                }
               }
             } else {
               // there was presumably no flutter mode set in the jaspr block, so we add it.

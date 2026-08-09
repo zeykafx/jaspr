@@ -55,7 +55,12 @@ mixin PubspecHelper on BaseCommand {
   }
 
   /// for a given list of packages, check if they are already installed, if not then prompt the user to install them
-  void conditionallyInstallDeps(Directory projectRoot, List<String> packages, {bool isDevDependency = false}) {
+  void conditionallyInstallDeps(
+    Directory projectRoot,
+    List<String> packages, {
+    bool isDevDependency = false,
+    bool alwaysInstallDeps = false,
+  }) {
     // check if the pubspec.yaml of the target project already contains the deps, if so return early
 
     final pubspecMap = readPubspec(projectRoot);
@@ -81,9 +86,8 @@ mixin PubspecHelper on BaseCommand {
       }
 
       final log = logger.logger;
-      if (log == null) {
-        // the confirm method on mason's logger require a terminal to be attached,
-        // if it isn't the case we tell the user to install the package themselves
+      // warn the user and don't install if there is no terminal attached and the install-deps flag was false (not passed)
+      if ((log == null || !stdout.hasTerminal) && !alwaysInstallDeps) {
         logger.write(
           "Cannot automatically add $packageName to pubspec.yaml, run ${yellow.wrap("dart pub add $packageName $pubAddArg")}",
           tag: Tag.cli,
@@ -92,10 +96,12 @@ mixin PubspecHelper on BaseCommand {
         continue;
       }
 
-      final result = logger.logger!.confirm(
-        'The ${cyan.wrap(packageName)} package is required. Do you want to add $packageName to your $depString?',
-        defaultValue: true,
-      );
+      final result =
+          alwaysInstallDeps ||
+          logger.logger!.confirm(
+            'The ${cyan.wrap(packageName)} package is required. Do you want to add $packageName to your $depString?',
+            defaultValue: true,
+          );
 
       if (!result) {
         logger.write(
@@ -119,7 +125,7 @@ mixin PubspecHelper on BaseCommand {
         workingDirectory: projectRoot.path,
       );
       if (pubCommand.exitCode != 0) {
-        log.err(pubCommand.stderr as String?);
+        log!.err(pubCommand.stderr as String?);
         logger.write(
           'Failed to run ${yellow.wrap("dart pub add $packageName $pubAddArg")}. There is probably more output above.',
           tag: Tag.cli,

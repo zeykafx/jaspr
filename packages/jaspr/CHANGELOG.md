@@ -1,3 +1,6 @@
+## Unreleased patch
+- Added `jaspr new component` command to generate new components and `jaspr new page` to generate new `jaspr_content` pages inside existing projects (Also supported by VSCode extension).
+
 ## 0.23.3
 
 - Added `detachRootComponent()` to `ComponentsBinding` to cleanly unmount the root component.
