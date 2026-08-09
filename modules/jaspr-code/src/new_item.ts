@@ -103,7 +103,7 @@ async function createJasprComponentWithType(data: JasprNewComponentOptions): Pro
   }
 
   // prompt for the component name
-  const name = await promptForComponentName("Component Name", "Enter a name for your new component", "MyComponent", checkDartIdentifier: true);
+  const name = await promptForComponentName("Component Name", "Enter a name for your new component", "MyComponent", true, false);
   if (!name) {
     return;
   }
