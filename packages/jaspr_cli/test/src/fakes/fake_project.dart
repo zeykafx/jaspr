@@ -21,11 +21,7 @@ extension FakeProject on FakeIO {
       fs.file('/root/$name/lib/main.server.dart')
         ..createSync()
         ..writeAsStringSync(fakeMainServerDart());
-    } else {
-      fs.file('/root/$name/web/index.html')
-        ..createSync()
-        ..writeAsStringSync(fakeIndexHtml());
-    }
+    } 
     fs.currentDirectory = '/root/$name';
   }
 

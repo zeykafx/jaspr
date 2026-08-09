@@ -469,9 +469,19 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     }
 
     // add flutter and jaspr_flutter_embed in dependencies if they aren't present (prompts to add them)
-    conditionallyInstallDeps(projectRoot, ['flutter', 'jaspr_flutter_embed'], isDevDependency: false, alwaysInstallDeps: alwaysInstallDeps);
+    conditionallyInstallDeps(
+      projectRoot,
+      ['flutter', 'jaspr_flutter_embed'],
+      isDevDependency: false,
+      alwaysInstallDeps: alwaysInstallDeps,
+    );
     // also install other useful deps
-    conditionallyInstallDeps(projectRoot, ['flutter_lints', 'flutter_test'], isDevDependency: true, alwaysInstallDeps: alwaysInstallDeps);
+    conditionallyInstallDeps(
+      projectRoot,
+      ['flutter_lints', 'flutter_test'],
+      isDevDependency: true,
+      alwaysInstallDeps: alwaysInstallDeps,
+    );
 
     // set jaspr.flutter mode to embedded if it isn't the case
     // If the flutter mode is set to plugins, then we ask the user if they

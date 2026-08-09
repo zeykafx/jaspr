@@ -64,7 +64,7 @@ void main() {
   });
 
   /// sets up a project with a given pubspec file and server entrypoint
-  void setupProject({String mode = 'static', String? pubspec, String? serverEntrypoint}) {
+  void setupProject({String mode = 'static', String? pubspec, String? serverEntrypoint, bool flutterProject = false}) {
     io.setupFakeProject('myapp', mode: mode);
     io.stubDartSDK();
 
@@ -76,6 +76,12 @@ void main() {
       io.fs.file('$projectRoot/lib/main.server.dart')
         ..createSync(recursive: true)
         ..writeAsStringSync(serverEntrypoint);
+    }
+
+    if (flutterProject) {
+      io.fs.file('/root/myapp/web/index.html')
+        ..createSync()
+        ..writeAsStringSync(fakeIndexHtml());
     }
   }
 
@@ -466,7 +472,7 @@ void main() {
 
     test('inserts references to bootstrap script in index.html (for client-side applications)', () async {
       await io.runZoned(() async {
-        setupProject(mode: 'client');
+        setupProject(mode: 'client', flutterProject: true);
 
         // add required deps to avoid prompt
         addDep('flutter', devDependency: false);
