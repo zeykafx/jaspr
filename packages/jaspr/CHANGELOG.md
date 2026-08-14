@@ -9,6 +9,7 @@
 
 - Added hot-reloading of generated stylesheets in `standalone` mode.
 - Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
 
 ## 0.23.3
 
