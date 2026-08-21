@@ -1,5 +1,21 @@
-## Unreleased patch
+## Unreleased breaking
+
+- Added **Server Components** to allow for more fine-grained control over the server-side rendered component trees.
+- **Breaking**: Renamed `Component.wrapElement()` to `Component.apply()` and added `ApplyTarget target` parameter used to target specific elements instead of only direct children.
+- **Breaking**: Removed support for `attachBetween` parameter in `ClientAppBinding.attachRootComponent()`, as it is no longer needed.
+- Added stateful server-side reload feature.
+- Require Dart 3.13 or later.
+- Update `package:analyzer` requirement to `>=13.3.0 <15.0.0`.
+
+- Added hot-reloading of generated stylesheets in `standalone` mode.
+- Style generation in `standalone` mode now also works when importing web libraries like `package:web` or `dart:js_interop`.
+- Replaced Jaspr's implementation of `Listenable`, `ValueListenable`, `ChangeNotifier` and `ValueNotifier` with the [`listen`](https://pub.dev/packages/listen) package.
 - Added `jaspr new component` command to generate new components and `jaspr new page` to generate new `jaspr_content` pages inside existing projects (Also supported by VSCode extension).
+
+## 0.23.4
+
+- Server rendering now fails with a 500 HTTP response instead of hanging indefinitely when an error occurs during the initial build, outside of a component's `build` method.
+- Worked around a Dart VM bug that caused server rendering to crash on `linux_x64` due to a `NoSuchMethodError` inside `TaskChain.then`.
 
 ## 0.23.3
 

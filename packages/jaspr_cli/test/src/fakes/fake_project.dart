@@ -21,7 +21,10 @@ extension FakeProject on FakeIO {
       fs.file('/root/$name/lib/main.server.dart')
         ..createSync()
         ..writeAsStringSync(fakeMainServerDart());
-    } 
+    }
+    fs.file('/root/$name/.dart_tool/package_config.json')
+      ..createSync(recursive: true)
+      ..writeAsStringSync(fakePackageConfig());
     fs.currentDirectory = '/root/$name';
   }
 
@@ -30,6 +33,9 @@ extension FakeProject on FakeIO {
     when(
       () => process.runSync('where', ['dart.bat', 'dart.exe']),
     ).thenAnswer((_) => ProcessResult(0, 0, '/fake/bin/dart', null));
+    when(
+      () => process.runSync('/fake/bin/dart', ['--version']),
+    ).thenAnswer((_) => ProcessResult(0, 0, 'Dart SDK version: 3.14.0', null));
 
     fs.file('/fake/version').createSync(recursive: true);
   }
@@ -89,3 +95,9 @@ String fakeIndexHtml() => '''
     </body>
 </html>
 ''';
+String fakePackageConfig() => jsonEncode({
+  'configVersion': 2,
+  'packages': [
+    {'name': 'jaspr', 'rootUri': 'file:///fake/jaspr', 'packageUri': 'lib/', 'languageVersion': '3.0'},
+  ],
+});
