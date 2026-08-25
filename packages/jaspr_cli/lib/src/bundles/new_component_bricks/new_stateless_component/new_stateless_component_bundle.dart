@@ -7,8 +7,7 @@ final newStatelessComponentBundle = MasonBundle.fromJson(<String, dynamic>{
   "files": [
     {
       "path": "{{name.snakeCase()}}.dart",
-      "data":
-          "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2RvbS5kYXJ0JzsKaW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKe3sjY2xpZW50fX0KQGNsaWVudAp7ey9jbGllbnR9fQpjbGFzcyB7e25hbWUucGFzY2FsQ2FzZSgpfX0gZXh0ZW5kcyBTdGF0ZWxlc3NDb21wb25lbnQgewogIGNvbnN0IHt7bmFtZS5wYXNjYWxDYXNlKCl9fSh7c3VwZXIua2V5fSk7CgogIEBvdmVycmlkZQogIENvbXBvbmVudCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgewogICAgcmV0dXJuIGRpdihbXSk7CiAgfQoKICB7eyNzdHlsZXN9fQogIEBjc3MKICBMaXN0PFN0eWxlUnVsZT4gZ2V0IHN0eWxlcyA9PiBbXTsKICB7ey9zdHlsZXN9fQp9Cg==",
+      "data": "aW1wb3J0ICdwYWNrYWdlOmphc3ByL2RvbS5kYXJ0JzsKaW1wb3J0ICdwYWNrYWdlOmphc3ByL2phc3ByLmRhcnQnOwoKe3sjY2xpZW50fX0KQGNsaWVudAp7ey9jbGllbnR9fQpjbGFzcyB7e25hbWUucGFzY2FsQ2FzZSgpfX0gZXh0ZW5kcyBTdGF0ZWxlc3NDb21wb25lbnQgewogIGNvbnN0IHt7bmFtZS5wYXNjYWxDYXNlKCl9fSh7c3VwZXIua2V5fSk7CgogIEBvdmVycmlkZQogIENvbXBvbmVudCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgewogICAgcmV0dXJuIGRpdihbXSk7CiAgfQoKICB7eyNzdHlsZXN9fQogIEBjc3MKICBMaXN0PFN0eWxlUnVsZT4gZ2V0IHN0eWxlcyA9PiBbXTsKICB7ey9zdHlsZXN9fQp9Cg==",
       "type": "text",
     },
   ],

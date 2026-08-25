@@ -71,8 +71,7 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     argParser.addOption(
       'path',
       abbr: 'p',
-      help:
-          'Location where the new component will be created (Defaults to ./lib/components)', // NOTE: the default path is set in getTargetDirectory
+      help: 'Location where the new component will be created (Defaults to ./lib/components)', // NOTE: the default path is set in getTargetDirectory
     );
     argParser.addFlag(
       'dry-run',
@@ -216,7 +215,7 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
       return ComponentType.stateless; // defaults to stateless if no flags are used
     }();
 
-    final (dir, name) = getTargetDirectory();
+    final (dir, name) = await getTargetDirectory();
 
     if (componentType == ComponentType.flutter) {
       return createFlutterViewComponent(dir, name);
@@ -248,7 +247,7 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
   }
 
   // figures out the component name and destination directory
-  (Directory, String) getTargetDirectory() {
+  Future<(Directory, String)> getTargetDirectory() async {
     if (argResults!.rest.length > 1) {
       usageException(
         'Too many positional arguments were provided, please only provide the component name as positional argument.',
@@ -257,7 +256,7 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
 
     // componentName is the name for the component, it can be written in PascalCase, camelCase, or snake_cake because
     // the mason template transforms the name into snake_case for the filename and in PascalCase for the class name
-    final componentName = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a component name:').trim();
+    final componentName = argResults!.rest.firstOrNull ?? (await logger.prompt('Specify a component name:')).trim();
 
     if (componentName.isEmpty) {
       usageException('"$componentName" is not a valid component name.');
@@ -330,7 +329,6 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
         'styles': withStyles,
         'client': isClient,
       },
-      logger: logger.logger,
     );
 
     // format the generated component
@@ -354,13 +352,6 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
 
   /// Generate a test for the newly created component under the /test dir
   Future<int> createTestFromTemplate(String componentPath, String name) async {
-    logger.write(
-      'Generating test for "$name"...',
-      progress: ProgressState.running,
-      tag: Tag.cli,
-      level: Level.info,
-    );
-
     final componentFile = File(componentPath).absolute;
 
     // try to find the root of the project (where pubspec.yaml is), if it is the cwd then the command
@@ -403,6 +394,12 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
       testDir.createSync(recursive: true);
     }
 
+    logger.write(
+      'Generating test for "$name"...',
+      progress: ProgressState.running,
+      tag: Tag.cli,
+      level: Level.info,
+    );
     final generator = await MasonGenerator.fromBundle(componentType.getTestBundle);
     final files = await generator.generate(
       DirectoryGeneratorTarget(testDir),
@@ -410,7 +407,6 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
         'name': name,
         'import': import,
       },
-      logger: logger.logger,
     );
 
     Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
@@ -423,7 +419,12 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     );
 
     // if jaspr_test is not in the dev dependencies, prompt the user to add it
-    conditionallyInstallDeps(projectRoot, ['jaspr_test'], isDevDependency: true, alwaysInstallDeps: alwaysInstallDeps);
+    await conditionallyInstallDeps(
+      projectRoot,
+      ['jaspr_test'],
+      isDevDependency: true,
+      alwaysInstallDeps: alwaysInstallDeps,
+    );
 
     return 0;
   }
@@ -432,13 +433,10 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
   Future<int> createFlutterViewComponent(Directory dir, String name) async {
     // if no flutter app name was provided, prompt for one
     if (flutterAppName.isEmpty) {
-      flutterAppName = logger.logger!
-          .prompt(
-            'Specify the Flutter App/Widget name (i.e., name of the Flutter App/Widget you wish to embed):',
-            defaultValue: 'MyFlutterApp',
-          )
-          .trim()
-          .pascalCase;
+      flutterAppName = (await logger.prompt(
+        'Specify the Flutter App/Widget name (i.e., name of the Flutter App/Widget you wish to embed):',
+        defaultValue: 'MyFlutterApp',
+      )).trim().pascalCase;
 
       logger.write(
         'Will create Jaspr component to embed ${yellow.wrap(flutterAppName)}.',
@@ -448,10 +446,10 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     }
 
     // ask the user whether to generate a sample flutter app or not
-    withSampleFlutterWidget ??= logger.logger!.confirm(
+    withSampleFlutterWidget ??= (await logger.confirm(
       'Do you wish to generate a sample Flutter widget with name $flutterAppName?',
       defaultValue: true,
-    );
+    ));
 
     if (withTest) {
       logger.write(
@@ -469,14 +467,14 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     }
 
     // add flutter and jaspr_flutter_embed in dependencies if they aren't present (prompts to add them)
-    conditionallyInstallDeps(
+    await conditionallyInstallDeps(
       projectRoot,
       ['flutter', 'jaspr_flutter_embed'],
       isDevDependency: false,
       alwaysInstallDeps: alwaysInstallDeps,
     );
     // also install other useful deps
-    conditionallyInstallDeps(
+    await conditionallyInstallDeps(
       projectRoot,
       ['flutter_lints', 'flutter_test'],
       isDevDependency: true,
@@ -486,7 +484,7 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
     // set jaspr.flutter mode to embedded if it isn't the case
     // If the flutter mode is set to plugins, then we ask the user if they
     // want to overwrite it or not
-    setFlutterMode(projectRoot);
+    await setFlutterMode(projectRoot);
 
     // set flutter.uses-material-design to true in pubspec.yaml
     setUseMaterialDesignPubspec(projectRoot);
@@ -589,7 +587,6 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
         'static_or_server': project.requireMode.isServerOrStatic,
         'flutterAppName': flutterAppName,
       },
-      logger: logger.logger,
     );
 
     Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
@@ -614,7 +611,6 @@ class NewComponentCommand extends BaseCommand with PubspecHelper, FlutterEmbedSe
         vars: {
           'flutterAppName': flutterAppName,
         },
-        logger: logger.logger,
       );
       Process.runSync('dart', ['format', files.first.path, '--line-length=120']);
       logger.write(

@@ -20,7 +20,7 @@ import 'pubspec_helpers.dart';
 mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
   /// Sets the flutter mode to embedded in the pubspec.yaml file for the project
   /// if the project has jaspr.flutter set to 'plugins', we ask the user if they want to change it to embedded or not
-  void setFlutterMode(Directory projectRoot) {
+  Future<void> setFlutterMode(Directory projectRoot) async {
     FlutterMode currentFlutterMode;
 
     // NOTE: we re-read the pubspec file after the potential installation of packages
@@ -57,7 +57,7 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
                   level: Level.warning,
                 );
               } else {
-                final bool overwritePlugins = logger.logger!.confirm(
+                final bool overwritePlugins = await logger.confirm(
                   'This project is set with jaspr.flutter mode set to plugins. Do you want to overwrite it to "embedded" to allow Flutter embedding?',
                   defaultValue: false,
                 );
@@ -220,8 +220,8 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
       }
 
       final headArgument = document!.argumentList.arguments
-          .whereType<NamedExpression>()
-          .where((a) => a.name.label.name == 'head')
+          .whereType<NamedArgument>()
+          .where((a) => a.name.lexeme == 'head')
           .firstOrNull;
 
       if (headArgument == null) {
@@ -230,7 +230,7 @@ mixin FlutterEmbedSetupHelper on BaseCommand, PubspecHelper {
         // we'll place the head arg right before the first existing arg, if there are none, we just place it after the left parenthesis of DOcument()
         final offset = anchor?.offset ?? document!.argumentList.leftParenthesis.end;
         builder.insert(offset, 'head: [\n        $scriptTag\n      ],\n      ');
-      } else if (headArgument.expression case final ListLiteral list) {
+      } else if (headArgument.argumentExpression case final ListLiteral list) {
         // if there already exists a head argument, we can add the script ref in there only if it doesn't already exist
         if (!list.toSource().contains('flutter_bootstrap.js')) {
           final indent = list.elements.isNotEmpty

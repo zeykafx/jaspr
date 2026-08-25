@@ -18,15 +18,13 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     argParser.addOption(
       'path',
       abbr: 'p',
-      help:
-          'Location where the new page will be created (Defaults to ./content)', // NOTE: the default path is set in getTargetDirectory
+      help: 'Location where the new page will be created (Defaults to ./content)', // NOTE: the default path is set in getTargetDirectory
     );
     argParser.addOption('format', help: 'Page format', defaultsTo: 'md');
     argParser.addOption('layout', help: 'Layout to use for the new page.');
     argParser.addOption(
       'title',
-      help:
-          'Frontmatter title to use for the new page. Defaults to the name in Title Case.', // default is not set here for obvious reasons
+      help: 'Frontmatter title to use for the new page. Defaults to the name in Title Case.', // default is not set here for obvious reasons
     );
     argParser.addOption('description', help: 'Front matter description to use for the new page.');
     argParser.addSeparator('Flags');
@@ -139,7 +137,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
 
     final (customContentDir, parsers, layouts) = await checkContentApp();
 
-    final (dir, name) = getTargetDirectory(customContentDir);
+    final (dir, name) = await getTargetDirectory(customContentDir);
 
     final projectRoot = findProjectRoot(Directory.current.absolute) ?? Directory.current.absolute;
     final pubspecMap = readPubspec(projectRoot);
@@ -171,7 +169,7 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       return 1;
     }
 
-    conditionallyInstallDeps(
+    await conditionallyInstallDeps(
       projectRoot,
       ['jaspr_content'],
       isDevDependency: false,
@@ -188,14 +186,14 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
   }
 
   // figures out the page name and destination directory
-  (Directory, String) getTargetDirectory(String customContentDir) {
+  Future<(Directory, String)> getTargetDirectory(String customContentDir) async {
     if (argResults!.rest.length > 1) {
       usageException(
         'Too many positional arguments were provided, please only provide the page name as positional argument.',
       );
     }
 
-    final rawName = argResults!.rest.firstOrNull ?? logger.logger!.prompt('Specify a page name:');
+    final rawName = argResults!.rest.firstOrNull ?? (await logger.prompt('Specify a page name:'));
 
     // the name may contain directories (e.g. "guides/deploying"), if that is the case then every segment except the last one
     // will be treated as directories nested under the target directory, with the last segment being the page name itself
@@ -267,13 +265,6 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
     List<String> parsers,
     List<String> layouts,
   ) async {
-    logger.write(
-      'Generating new page "$name.$pageFormat"...',
-      tag: Tag.cli,
-      level: Level.info,
-      progress: ProgressState.running,
-    );
-
     // if no custom parsers are used and the format provided is not parsable, then warn the user
     // e.g., if the user want's a markdown page but only the HtmlParser is used
     if (parsers.isNotEmpty && !parsers.contains(pageFormat) && !parsers.contains('custom')) {
@@ -283,12 +274,10 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
 
       // only prompt if there is a terminal attached
       if (stdout.hasTerminal) {
-        confirmRes =
-            logger.logger?.confirm(
-              '\n[WARNING] Could not find the parser required to parse the provided format "$pageFormat". Do you want to continue anyway?',
-              defaultValue: true,
-            ) ??
-            true;
+        confirmRes = (await logger.confirm(
+          '[WARNING] Could not find the parser required to parse the provided format "$pageFormat". Do you want to continue anyway?',
+          defaultValue: true,
+        ));
       }
 
       if (!confirmRes) {
@@ -307,12 +296,10 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       bool confirmRes = ignorePrompts;
 
       if (stdout.hasTerminal) {
-        confirmRes =
-            logger.logger?.confirm(
-              '\n[WARNING] Could not find the prebuilt layout to display the requested "$pageLayout" and no custom layout is defined. Do you want to continue anyway?',
-              defaultValue: false,
-            ) ??
-            false;
+        confirmRes = (await logger.confirm(
+          '[WARNING] Could not find the prebuilt layout to display the requested "$pageLayout" and no custom layout is defined. Do you want to continue anyway?',
+          defaultValue: false,
+        ));
       }
 
       if (!confirmRes) {
@@ -325,6 +312,12 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
       }
     }
 
+    logger.write(
+      'Generating new page "$name.$pageFormat"...',
+      tag: Tag.cli,
+      level: Level.info,
+      progress: ProgressState.running,
+    );
     // select the right bundle based on the required component type
     final generator = await MasonGenerator.fromBundle(newContentPageBundle);
     final files = await generator.generate(
@@ -347,7 +340,6 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
         'isMd': pageFormat.contains('md'),
         'isHtml': pageFormat == 'html',
       },
-      logger: logger.logger,
     );
 
     logger.write(
@@ -390,10 +382,11 @@ class NewPageCommand extends BaseCommand with PubspecHelper {
         return ('', <String>[], <String>[]);
       }
 
-      final namedArgs = contentAppVisitor.contentApp!.argumentList.arguments.whereType<NamedExpression>();
+      final namedArgs = contentAppVisitor.contentApp!.argumentList.arguments.whereType<NamedArgument>();
 
       // small helper to get the expression for an argument
-      Expression? argument(String name) => namedArgs.where((a) => a.name.label.name == name).firstOrNull?.expression;
+      Expression? argument(String name) =>
+          namedArgs.where((a) => a.name.lexeme == name).firstOrNull?.argumentExpression;
 
       // get the expression from the directory arg, if the argument is present, then the pages may be located elsewhere than "content"
       final customContentDir = switch (argument('directory')) {
